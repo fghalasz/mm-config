@@ -73,8 +73,12 @@ ${SUDO} apt-get -q -y dist-upgrade
 #    Add additonal debian packages
 #
 mm_echo "Installing additional Debian packages"
-${SUDO} apt-get  -q -y install build-essential automake autoconf libtool gettext
-${SUDO} apt-get  -q -y install libasound2-dev
+${SUDO} apt-get -q -y install build-essential automake autoconf libtool gettext
+${SUDO} apt-get -q -y install libasound2-dev
+if [ ${ROLE} = gui ]; then
+    ${SUDO} apt-get -q -y install sshfs
+    ${SUDO} apt-get -q -y install tcl tk
+fi
 
 #
 #   Disable WiFi at startup
