@@ -1,0 +1,21 @@
+audioapi: 1
+noaudioin: True
+noaudioout: False
+audiooutdev1: 3 2
+audiooutdevname1: ?
+audiobuf: 25
+rate: 44100
+callback: 0
+blocksize: 64
+midiapi: 0
+nomidiin: True
+nomidiout: True
+path1: /home/gui/pd/externals
+npath: 1
+standardpath: 1
+verbose: 0
+nloadlib: 0
+defeatrt: 0
+flags: 
+zoom: 2
+loading: no

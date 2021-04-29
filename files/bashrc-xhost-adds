@@ -1,0 +1,17 @@
+#
+# allow other local users to use the X session we start
+#
+mm_add_xhost() {
+    if [ -x /usr/bin/xhost ]; then
+        /usr/bin/xhost | /usr/bin/grep $1 >/dev/null 2>/dev/null
+        if [ $? != 0 ]; then
+            /usr/bin/xhost +si:localuser:$1 >/dev/null 2>/dev/null
+        fi
+    fi
+}
+for MM_USER in pi gui core dac 
+do
+    mm_add_xhost $MM_USER
+done
+
+
