@@ -53,8 +53,14 @@ else
     exit 1
 fi
 
-#CUT
-if false; then
+#
+#    Fix up git remote url for this script
+#
+pushd ${DIR} >/dev/null
+git remote rename origin github
+git remote set-url github git@github.com:fghalasz/mm-config.git
+popd >/dev/null 
+mm_echo "git url for this script fixed up"
 
 #
 #    Update all installed software
@@ -172,8 +178,11 @@ fi
 #    Configure git
 #
 if [ -e /home/pi/.gitconfig ]; then
-	${SUDO} cp /home/pi/.gitconfig /home/${ROLE}/.gitconfig
-	${SUDO} chown ${ROLE}:${ROLE} /home/${ROLE}/.gitconfig
+    ${SUDO} cp /home/pi/.gitconfig /home/${ROLE}/.gitconfig
+    ${SUDO} chown ${ROLE}:${ROLE} /home/${ROLE}/.gitconfig
+else
+    ${SUDO} su -l ${ROLE} -c "git config --global user.email \"mm@mm.com\""
+    ${SUDO} su -l ${ROLE} -c "git config --global user.name \"MM Developer\""
 fi
 mm_echo "Git configured"
 
@@ -197,9 +206,6 @@ EOF
 cd /home/${ROLE}/pd/code
 ${SUDO} make install
 mm_echo "... done"
-
-fi
-#CUT
 
 #
 #   Install pure data externals
