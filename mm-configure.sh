@@ -146,7 +146,7 @@ ${SUDO} systemctl start ssh
 if [ -e /tmp/bazzle ]; then
     ${SUDO} rm -rf /tmp/bazzle
 fi
-sed -f ${FILES}/dot-ssh-dir/sedscript <${FILES}/dot-ssh-dir/xyzzy >/tmp/bazzle
+sed -f ${FILES}/dot-ssh-utils/sedscript <${FILES}/dot-ssh-dir/xyzzy >/tmp/bazzle
 install_ssh () {
     ${SUDO} cp -r ${FILES}/dot-ssh-dir /home/${1}/.ssh
     ${SUDO} rm  /home/${1}/.ssh/xyzzy
@@ -280,7 +280,11 @@ mm_echo "Hostname, locale, etc configured."
 
 
 mm_echo "      Done with configuration"
-
+echo " "
+echo " "
+echo " "
+echo "???????????????????????????????????????????????????????????"
+echo " "
 
 #
 #    Reboot
@@ -290,11 +294,12 @@ while true
 do
   read -p  "Type Y<RETURN> to reboot now; N<RETURN> to reboot manually later:  " reboot
   case $reboot in
-   [yY]* ) 
+   [yY]* ) echo "OK.  Rbooting ..."
 	   sudo reboot
            break;;
 
-   [nN]* ) break;;
+   [nN]* ) echo "OK, bye"
+	   break;;
 
    * )     echo "Dude, just enter Y or N, please.";;
   esac
