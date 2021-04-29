@@ -284,7 +284,7 @@ mm_echo "      Done with configuration"
 
 while true
 do
-  read -p -n 1 "Type Y to reboot now; N to reboot manually later:  " reboot
+  read -p  "Type Y<RETURN> to reboot now; N<RETURN> to reboot manually later:  " reboot
   case $reboot in
    [yY]* ) 
 	   sudo reboot
