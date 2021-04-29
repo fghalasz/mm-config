@@ -9,9 +9,11 @@ mm_add_xhost() {
         fi
     fi
 }
-for MM_USER in pi gui core dac 
-do
-    mm_add_xhost $MM_USER
-done
+if [ "X${DISPLAY}X" != "XX" ]; then
+    for MM_USER in pi gui core dac 
+    do
+        mm_add_xhost $MM_USER
+    done
+fi
 
 

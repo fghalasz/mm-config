@@ -10,7 +10,12 @@
 #    Defines
 #
 SUDO=/usr/bin/sudo
-
+mm_echo () 
+{
+    echo "########################################################"
+    echo $1
+    echo "########################################################"
+}
 
 #
 #    Check args
@@ -50,17 +55,18 @@ fi
 
 #CUT
 if false; then
+
 #
 #    Update all installed software
 #
-echo "Updating system software"
+mm_echo "Updating system software"
 ${SUDO} apt-get -q -y update
 ${SUDO} apt-get -q -y dist-upgrade
 
 #
 #    Add additonal debian packages
 #
-echo "Installing additional Debian packages"
+mm_echo "Installing additional Debian packages"
 ${SUDO} apt-get  -q -y install build-essential automake autoconf libtool gettext
 ${SUDO} apt-get  -q -y install libasound2-dev
 
@@ -77,14 +83,14 @@ if [ $? -ne 0 ]; then
     ${SUDO} crontab /tmp/bazzle
 fi
 ${SUDO} rm -rf /tmp/bazzle
-echo "WiFi disabled at startup"
+mm_echo "WiFi disabled at startup"
 
 
 #
 #    Change pi user passwd
 #
 echo -e ".Spectra70\n.Spectra70\n" | ${SUDO} passwd pi 2>/dev/null
-echo "User pi password changed."
+mm_echo "User pi password changed."
 
 #
 #    Add users as per ROLE
@@ -95,31 +101,31 @@ case ${ROLE} in
       	        | ${SUDO} adduser -q --uid 1001  gui 2>/dev/null
 	${SUDO} adduser -q gui sudo
 	${SUDO} su -c "echo \"gui ALL=(ALL) NOPASSWD: ALL\" >>/etc/sudoers.d/010_others-nopasswd"
-        echo "Added user gui"
+        mm_echo "Added user gui"
     ;;
 esac
 case ${ROLE} in
     core | gui )
         echo -e ".Spectra70\n.Spectra70\nPure Data Core\n\n\n\n\n\n\n" \
-	    | ${SUDO} adduser -q --uid 1002  core 
+	    | ${SUDO} adduser -q --uid 1002  core 2>/dev/null 
 	${SUDO} adduser -q core sudo
 	${SUDO} su -c "echo \"core ALL=(ALL) NOPASSWD: ALL\" >>/etc/sudoers.d/010_others-nopasswd"
-        echo "Added user core"
+        mm_echo "Added user core"
     ;;
 esac
 case ${ROLE} in
     dac | gui )
         echo -e ".Spectra70\n.Spectra70\nPure Data Dac\n\n\n\n\n\n\n" \
-	    | ${SUDO} adduser -q --uid 1003  dac 
+	    | ${SUDO} adduser -q --uid 1003  dac  2>/dev/null
 	${SUDO} adduser -q dac sudo
 	${SUDO} su -c "echo \"dac ALL=(ALL) NOPASSWD: ALL\" >>/etc/sudoers.d/010_others-nopasswd"
-        echo "Added user dac"
+        mm_echo "Added user dac"
     ;;
 esac
 
 if [ ${ROLE} = gui ]; then
     ${SUDO} su -l gui -c "${SUDO} raspi-config nonint do_boot_behaviour B4"
-    echo "Set auto login to gui user" 
+    mm_echo "Set auto login to gui user" 
 fi
 
 #
@@ -149,9 +155,7 @@ if [ ${ROLE} = gui ]; then
     ${SUDO} chown -R dac:dac /home/dac/.ssh
 fi
 rm -rf /tmp/bazzle
-echo "SSH installed"
-#CUT
-fi
+mm_echo "SSH installed"
 
 #
 #    On gui only, enable x windows access for all users
@@ -161,29 +165,29 @@ if [ ${ROLE} = gui ]; then
     do
         ${SUDO} su -l ${U} -c "cat < ${FILES}/bashrc-xhost-adds >> /home/${U}/.bashrc"
     done
-    echo "xhost permissions modified"
+    mm_echo "xhost permissions modified"
 fi
 
 #
 #    Configure git
 #
-if [ -e /home/pi/.gitconfigure ]; then
-	${SUDO} cp /home/pi/.gitconfigure /home/${ROLE}/.gitconfigure
-	${SUDO} chown ${ROLE}:${ROLE} /home/${ROLE}/.gitconfigure
+if [ -e /home/pi/.gitconfig ]; then
+	${SUDO} cp /home/pi/.gitconfig /home/${ROLE}/.gitconfig
+	${SUDO} chown ${ROLE}:${ROLE} /home/${ROLE}/.gitconfig
 fi
-echo "Git configured"
+mm_echo "Git configured"
 
 
 
 #
 #   Fetch, make and install pure data
 #
-echo "Fetching, make'ing and installing Pure Data ..."
+mm_echo "Fetching, make'ing and installing Pure Data ..."
 ${SUDO} su -l ${ROLE} <<EOF
 cd /home/${ROLE}
 mkdir -p pd
 cd pd
-git clone git@github.com:fghalasz/pure-data.git code
+GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:fghalasz/pure-data.git code
 cd code
 git remote rename origin github
 ./autogen.sh
@@ -192,12 +196,15 @@ make
 EOF
 cd /home/${ROLE}/pd/code
 ${SUDO} make install
-echo "... done"
+mm_echo "... done"
+
+fi
+#CUT
 
 #
 #   Install pure data externals
 #
-echo "Installing pure data externals"
+mm_echo "Installing pure data externals ..."
 ${SUDO} su -l ${ROLE} <<EOF
 cd /home/${ROLE}
 mkdir -p pd
@@ -205,21 +212,23 @@ cd pd
 mkdir -p externals
 cd externals
 tar -xJf ${FILES}/externals-dir.tar.xz .
+EOF
+mm_echo "... Done"
 
 
 #
 #   Fetch pure data patches
 #
-echo "Fetching Pure Data patches ..."
+mm_echo "Fetching Pure Data patches ..."
 ${SUDO} su -l ${ROLE} <<EOF
 cd /home/${ROLE}
 mkdir -p pd
 cd pd
-git clone git@github.com:fghalasz/pd-patches.git patches
+GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:fghalasz/pd-patches.git patches
 cd patches
 git remote rename origin github
 EOF
-echo "... done"
+mm_echo "... done"
 
 #
 #   Install pure data configuration file
@@ -228,16 +237,18 @@ ${SUDO} su -l ${ROLE} <<EOF
 cp ${FILES}/pd/pdsettings-${ROLE} /home/${ROLE}/.pdsettings
 mkdir -p /home/${ROLE}/.config
 cp -R ${FILES}/pd/pdconfig-dir-${ROLE} /home/${ROLE}/.config/Pd
+EOF
+mm_echo "Pure Data configuration installed"
 
 #
 #   Fetch, make and install mm-tools
 #
-echo "Fetching mm-tools ..."
+mm_echo "Fetching mm-tools ..."
 ${SUDO} su -l ${ROLE} <<END_LEVEL1
 cd /home/${ROLE}
 mkdir -p mm/tools
 cd mm
-git clone git@github.com:fghalasz/mmm-tools.git tools
+GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:fghalasz/mm-tools.git tools
 cd tools
 git remote rename origin github
 cat >>/home/${ROLE}/.bashrc <<END_LEVEL2
@@ -247,12 +258,7 @@ cat >>/home/${ROLE}/.bashrc <<END_LEVEL2
 PATH=/home/${ROLE}/mm/tools/bin:\$PATH
 END_LEVEL2
 END_LEVEL1
-echo "... done"
-
-echo "-----------------------------------------------------------"
-echo "      Done with configuration"
-echo "-----------------------------------------------------------"
-
+mm_echo "... done"
 
 #
 #   Set hostname, locale, etc
@@ -264,7 +270,10 @@ layout=us
 ${SUDO} raspi-config nonint do_change_locale $locale
 ${SUDO} raspi-config nonint do_configure_keyboard $layout
 ${SUDO} raspi-config nonint do_hostname ${ROLE}
-echo "Hostname, locale, etc configured."
+mm_echo "Hostname, locale, etc configured."
+
+
+mm_echo "      Done with configuration"
 
 
 #
@@ -273,7 +282,7 @@ echo "Hostname, locale, etc configured."
 
 while true
 do
-  read -p "Type Y to reboot now; N to reboot manually later" reboot
+  read -p -n 1 "Type Y to reboot now; N to reboot manually later:  " reboot
   case $reboot in
    [yY]* ) 
 	   sudo reboot
