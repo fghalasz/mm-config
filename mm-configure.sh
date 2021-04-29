@@ -137,28 +137,24 @@ fi
 #
 #    Enable ssh server and install ssh keys
 #
+${SUDO} systemctl enable ssh
+${SUDO} systemctl start ssh
 if [ -e /tmp/bazzle ]; then
     ${SUDO} rm -rf /tmp/bazzle
 fi
 sed -f ${FILES}/dot-ssh-dir/sedscript <${FILES}/dot-ssh-dir/xyzzy >/tmp/bazzle
-${SUDO} systemctl enable ssh
-${SUDO} systemctl start ssh
-${SUDO} cp -r ${FILES}/dot-ssh-dir /home/${ROLE}/.ssh
-${SUDO} rm  /home/${ROLE}/.ssh/xyzzy
-${SUDO} cp /tmp/bazzle /home/${ROLE}/.ssh/id_rsa
-${SUDO} chmod go-rwx /home/${ROLE}/.ssh/id_rsa
-${SUDO} chown -R ${ROLE}:${ROLE} /home/${ROLE}/.ssh
+install_ssh () {
+    ${SUDO} cp -r ${FILES}/dot-ssh-dir /home/${1}/.ssh
+    ${SUDO} rm  /home/${1}/.ssh/xyzzy
+    ${SUDO} cp /tmp/bazzle /home/${1}/.ssh/id_rsa
+    ${SUDO} chmod go-rwx /home/${1}/.ssh/id_rsa
+    ${SUDO} chown -R ${1}:${1} /home/${1}/.ssh
+}
+install_ssh ${ROLE}
+install_ssh pi
 if [ ${ROLE} = gui ]; then
-    ${SUDO} cp -r ${FILES}/dot-ssh-dir /home/core/.ssh
-    ${SUDO} rm  /home/core/.ssh/xyzzy
-    ${SUDO} cp /tmp/bazzle /home/core/.ssh/id_rsa
-    ${SUDO} chmod go-rwx /home/core/.ssh/id_rsa
-    ${SUDO} chown -R core:core /home/core/.ssh
-    ${SUDO} cp -r ${FILES}/dot-ssh-dir /home/dac/.ssh
-    ${SUDO} rm  /home/dac/.ssh/xyzzy
-    ${SUDO} cp /tmp/bazzle /home/dac/.ssh/id_rsa
-    ${SUDO} chmod go-rwx /home/dac/.ssh/id_rsa
-    ${SUDO} chown -R dac:dac /home/dac/.ssh
+    install_ssh core
+    install_ssh dac
 fi
 rm -rf /tmp/bazzle
 mm_echo "SSH installed"
