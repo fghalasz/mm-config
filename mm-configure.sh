@@ -274,6 +274,8 @@ ${SUDO} timedatectl set-timezone America/Los_Angeles
 locale=en_US.UTF-8
 layout=us
 ${SUDO} raspi-config nonint do_change_locale $locale
+mm_echo "Sleeping for 30 seconds to complete locale update ..."
+sleep 30
 ${SUDO} raspi-config nonint do_configure_keyboard $layout
 ${SUDO} raspi-config nonint do_hostname ${ROLE}
 mm_echo "Hostname, locale, etc configured."
