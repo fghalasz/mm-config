@@ -135,8 +135,10 @@ esac
 
 if [ ${ROLE} = gui ]; then
     ${SUDO} su -l gui -c "${SUDO} raspi-config nonint do_boot_behaviour B4"
-    mm_echo "Set auto login to gui user" 
+else
+    ${SUDO} su -l ${ROLE} -c "${SUDO} raspi-config nonint do_boot_behaviour B2"
 fi
+mm_echo "Set auto login to ${ROLE} user" 
 
 #
 #    Enable ssh server and install ssh keys
