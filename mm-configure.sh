@@ -69,9 +69,6 @@ mm_echo "Updating system software"
 ${SUDO} apt-get -q -y update
 ${SUDO} apt-get -q -y dist-upgrade
 
-#CUT
-if 0
-
 #
 #    Add additonal debian packages
 #
@@ -269,11 +266,6 @@ END_LEVEL2
 END_LEVEL1
 mm_echo "... done"
 
-#CUT
-fi
-
-
-
 #
 #   Set hostname, locale, etc
 #
@@ -282,7 +274,7 @@ ${SUDO} timedatectl set-timezone America/Los_Angeles
 # Set up locale
 ${SUDO} su -l <<EOF
 sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-dpkg-reconfigure --fontend=noninteractive locales
+dpkg-reconfigure --frontend=noninteractive locales
 update-locale LANG=en_US.UTF-8
 EOF
 ${SUDO} raspi-config nonint do_configure_keyboard us
