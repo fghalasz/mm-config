@@ -69,6 +69,9 @@ mm_echo "Updating system software"
 ${SUDO} apt-get -q -y update
 ${SUDO} apt-get -q -y dist-upgrade
 
+#CUT
+if 0
+
 #
 #    Add additonal debian packages
 #
@@ -266,17 +269,26 @@ END_LEVEL2
 END_LEVEL1
 mm_echo "... done"
 
+#CUT
+fi
+
+
+
 #
 #   Set hostname, locale, etc
 #
 ${SUDO} raspi-config nonint do_wifi_country US
 ${SUDO} timedatectl set-timezone America/Los_Angeles
+mm_echo "START"
 ${SUDO} su -l <<EOF
 LANG=en_US.UTF-8 
 raspi-config nonint do_change_locale en_US.UTF-8
 EOF
+mm_echo "END"
+sleep 30
 layout=us
 ${SUDO} raspi-config nonint do_configure_keyboard $layout
+mm_echo "END TWO"
 ${SUDO} raspi-config nonint do_hostname ${ROLE}
 mm_echo "Hostname, locale, etc configured."
 
