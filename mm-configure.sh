@@ -279,16 +279,13 @@ fi
 #
 ${SUDO} raspi-config nonint do_wifi_country US
 ${SUDO} timedatectl set-timezone America/Los_Angeles
-mm_echo "START"
+# Set up locale
 ${SUDO} su -l <<EOF
-LANG=en_US.UTF-8 
-raspi-config nonint do_change_locale en_US.UTF-8
+sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+dpkg-reconfigure --fontend=noninteractive locales
+update-locale LANG=en_US.UTF-8
 EOF
-mm_echo "END"
-sleep 30
-layout=us
-${SUDO} raspi-config nonint do_configure_keyboard $layout
-mm_echo "END TWO"
+${SUDO} raspi-config nonint do_configure_keyboard us
 ${SUDO} raspi-config nonint do_hostname ${ROLE}
 mm_echo "Hostname, locale, etc configured."
 
