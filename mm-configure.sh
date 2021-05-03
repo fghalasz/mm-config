@@ -236,6 +236,8 @@ GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no" git clone git@github.com:fghal
 cd patches
 git remote rename origin github
 EOF
+${SUDO} cp /home/${ROLE}/pd/patches/gui-plugins/mm-plugin.tcl /home/${ROLE}/pd/externals
+${SUDO} chown ${ROLE}:${ROLE} /home/${ROLE}/pd/externals/mm-plugin.tcl
 mm_echo "... done"
 
 #
